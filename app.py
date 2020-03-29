@@ -1,8 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 import sqlite3 
 import json
 
 app = Flask(__name__)
+app.secret_key = 'mz*.5"tjXQ97x{h'
 
 database = 'lmsdatabase.db'
 
@@ -69,9 +70,16 @@ def login():
         if completion == False:
             error = 'Invalid Credentials. Please try again.'
         else:
+            session['username'] = username
             return redirect(url_for('dashboard'))
 
     return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
 def validate(username, password):
     con = create_connection(database)
@@ -93,7 +101,11 @@ def check_password(hashed_password, user_password):
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    if 'username' in session:
+        username = session['username']
+        return render_template('dashboard.html', user=username)
+    else:
+        return redirect(url_for('login'))
 
 if __name__== "__main__":
     app.run(debug=True)
