@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="403" height="138" viewBox="0 0 403 138">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #47a06e;
+      }
+
+      .cls-2 {
+        font-size: 26.667px;
+        fill: #334d59;
+        text-anchor: middle;
+        font-family: "Open Sans";
+        font-weight: 800;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="69" cy="69" r="69"/>
+  <text id="FiveTeen" class="cls-2" transform="translate(228.412 106.647) scale(2.936)"><tspan x="0">FiveTeen</tspan></text>
+</svg>

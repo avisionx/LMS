@@ -1,0 +1,100 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <nav class="navbar navbar-light bg-white shadow fixed-top">
+        <div class="container-fluid px-2 px-lg-4">
+            <a class="navbar-brand" href="/">
+                <img src="/static/img/logo.svg" height="35" alt="LMS">
+            </a>
+            <div class="ml-auto">
+                <a href="/login" class="btn btn-outline-success rounded-pill btn-sm px-3">Staff Login</a>
+            </div>
+        </div>
+    </nav>
+    <h4 class="mt-5 pt-3">DASHBOARD</h4>
+    
+{% endblock %}
+
+{% block script %}
+
+
+    <script>
+        
+        $("#searchBook").keyup( (event)=> {
+            search_book(event);
+        }) 
+
+        function search_book(event) {
+            event.preventDefault();
+            input = $("#searchBook").val().toLowerCase();
+            let x = document.getElementsByClassName('book'); 
+            for (i = 0; i < x.length; i++) {  
+                var textTitle = x[i].children[1].children[0].innerHTML;
+                var textAuthor = x[i].children[1].children[1].innerHTML;
+                if (!textTitle.toLowerCase().includes(input) && !textAuthor.toLowerCase().includes(input)) { 
+                    $(x[i].parentNode).addClass("d-none");
+                } 
+                else { 
+                    $(x[i].parentNode).removeClass("d-none");                
+                } 
+            }
+        }
+
+        function showModal(bookId) {
+            fetchData('/book/' + bookId, populateModal)
+            $("html, body").animate({ scrollTop: 0 }, "fast");
+            $('body').addClass("no-scroll");
+            $('html').addClass("no-scroll");
+            $(".modalContainer").fadeIn();
+            $(".modalContainer").removeClass("d-none");
+        }
+
+        function get_avail(issued, total) {
+            if(total > issued) {
+                return '<span class="badge badge-pill bg-success">Available</span>';
+            }
+            else {
+                return '<span class="badge badge-pill bg-danger">Unavailable</span>';
+            }
+        }
+
+        function populateModal(response) {
+            var data = response.data;
+
+            bImg = data.thumbnailUrl
+            bTitle = data.title
+            bAuthor = data.authors
+            bRack = data.rack
+            bCategory = data.categories.replace("\\", "")
+            bCategory = bCategory.replace(",", ", ")
+            bIsbn = data.isbn
+            bShortDesc = data.shortDescription
+            bLongDesc = data.longDescription
+            bAvail = get_avail(data.issued, data.total)
+
+            ele = '<div class="row mt-3"><div class="col-12 col-md-auto px-5 px-md-0"><img src="' + bImg + '" style="min-height: 200px; min-width: 100px;" alt=""></div><div class="col"><h4 class="font-weight-bold text-dark text-left mt-3 mt-md-2 mb-1">' + bTitle + '</h4><div class="font-weight-light text-secondary d-flex text-left mb-0 small">' + bAuthor + '</div><div class="mt-0 small text-dark">Status: ' +  bAvail  + '</div><p class="mb-0 text-primary small">Rack No: <span>' + bRack + '</span></p><p class="mt-0 small text-warning mb-0">Category: ' + bCategory + '</p><p class="mt-0 small text-secondary mb-0">ISBN: ' + bIsbn + '</p></div></div><h5 class="font-weight-light mt-3 mb-1">Description</h5><p>'+ bShortDesc +'</p><p>' + bLongDesc +  '</p>';  
+
+            $("#modalContent").html(ele);
+            $("#modalContent").removeClass("d-none");
+            $("#modalSpinner").addClass("d-none");
+        }
+
+
+        function hideModal() {
+            $('body').removeClass("no-scroll");
+            $('html').removeClass("no-scroll");
+            $(".modalContainer").fadeOut(function () {
+            $("#modalContent").addClass("d-none");
+            $("#modalSpinner").removeClass("d-none");
+            });
+        }
+
+        $(document).on('keydown', function(event) {
+            if (event.key == "Escape") {
+                hideModal();
+            }
+        });
+
+    </script>
+{% endblock %}

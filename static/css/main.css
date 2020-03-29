@@ -1,0 +1,83 @@
+html, body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.hoverBold:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3) !important;
+}
+
+.modalContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.bg-translucent {
+    background: rgba(0, 0, 0, 0.7)
+}
+
+
+.no-scroll {
+    overflow:hidden
+}
+
+@-webkit-keyframes gradient {
+    0%{background-position:0% 74%}
+    50%{background-position:100% 27%}
+    100%{background-position:0% 74%}
+}
+@-moz-keyframes gradient {
+    0%{background-position:0% 74%}
+    50%{background-position:100% 27%}
+    100%{background-position:0% 74%}
+}
+@keyframes gradient {
+    0%{background-position:0% 74%}
+    50%{background-position:100% 27%}
+    100%{background-position:0% 74%}
+}
+
+
+.input-container {
+    transition-duration: 300ms;
+}
+.input-container:hover {
+    background: #e6e6e6;
+}
+input:-webkit-autofill {
+    border: none;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.v-center {
+    display: flex;
+    align-items: center;
+}
+.h-center {
+    justify-content: center;
+}
+.bg-gradient {
+    background: rgb(71,160,110);
+    background: -moz-linear-gradient(268deg, rgba(71,160,110,1) 0%, rgba(59,124,180,1) 100%);    
+    background: -webkit-linear-gradient(268deg, rgba(71,160,110,1) 0%, rgba(59,124,180,1) 100%);
+    background: linear-gradient(268deg, #47a06e, #3b7cb4);
+    background-size: 400% 400%;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#47a06e",endColorstr="#3b7cb4",GradientType=1);
+    -webkit-animation: gradient 15s ease infinite;
+    -moz-animation: gradient 15s ease infinite;
+    animation: gradient 15s ease infinite;
+}
+
+.customScroll::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+.customScroll::-webkit-scrollbar {
+	width: 5px;
+    background-color: #F5F5F5;
+}
+.customScroll::-webkit-scrollbar-thumb {
+	background-color: rgba(0,0,0,0.5);
+}

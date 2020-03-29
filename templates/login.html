@@ -1,0 +1,46 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="bg-gradient v-center h-center px-3" style="min-height: 100vh;">
+  <div class="container py-4">
+    <div class="row bg-white py-5 rounded-lg shadow" style="min-height: 80vh;">
+      
+      <div class="col-12 col-lg-6 v-center h-center">
+        <img src="/static/img/login-image.svg" class="w-75" alt="Login">
+      </div>
+      
+      <div class="col-12 col-lg-6 v-center h-center">
+        <div style="width: 85%">
+          
+          <h2 class="text-info font-weight-bold mb-4 mb-lg-5 mt-5 mt-lg-0 text-center">Student Login</h2>
+          
+          <form method="post" class="mb-4" action="">
+            <div class="input-group mb-3 mr-sm-2 border py-2 px-3 rounded-pill input-container">
+              <div class="input-group-prepend">
+                <div class="input-group-text bg-transparent border-0 rounded-pill pr-0"><i class="fas fa-envelope text-primary" aria-hidden="true"></i></div>
+              </div>
+              <input type="email" class="form-control border-0 rounded-pill bg-transparent" placeholder="Email" name="username" autofocus="" autocapitalize="none" autocomplete="email" maxlength="254" value="{{request.form.username }}" required="" id="id_username">
+            </div>
+            <div class="input-group mb-2 mr-sm-2 border py-2 px-3 rounded-pill input-container">
+              <div class="input-group-prepend">
+                <div class="input-group-text bg-transparent border-0 rounded-pill pr-0"><i class="fas fa-key text-primary"></i></div>
+              </div>
+              <input type="password" class="form-control border-0 rounded-pill bg-transparent" placeholder="Password" name="password" autocomplete="current-password" required="" value="{{request.form.password }}" id="id_password">
+            </div>
+            <input type="submit" class="btn btn-lg btn-success rounded-pill w-100 mt-4" value="Login" />
+            
+          </form>
+
+          {% if error %}
+          <div class="alert alert-warning small px-3" role="alert">
+            {{error}}
+          </div> 
+          {% endif %}
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
