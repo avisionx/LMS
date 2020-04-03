@@ -81,3 +81,25 @@ input:-webkit-autofill {
 .customScroll::-webkit-scrollbar-thumb {
 	background-color: rgba(0,0,0,0.5);
 }
+
+#dashNav > li > a {
+    color: #fff;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+#dashNav > li > a:hover {
+    color: #999999;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+#dashNav > li > a.active {
+    color: #fff;
+    background-color: #2e628e;
+    border-color: #2b5b84;
+}
+
+.hide {
+    display: none;
+}

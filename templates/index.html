@@ -4,7 +4,11 @@
 
     <nav class="navbar navbar-light bg-white shadow fixed-top">
         <div class="container-fluid px-2 px-lg-4">
+            {% if user %}
+            <a class="navbar-brand" href="/dashboard">
+            {% else %}
             <a class="navbar-brand" href="/">
+            {% endif %}
                 <img src="/static/img/logo.svg" height="35" alt="LMS">
             </a>
             <div class="ml-auto">
@@ -16,7 +20,7 @@
     <div class="container-fluid px-3 px-lg-5 pt-3 mt-5 mb-5">
 
         <form class="d-flex mt-3 mb-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search Book" id="searchBook">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search Book/Author" id="searchBook">
             <button class="btn btn-outline-primary btn-sm px-3 ml-2" onclick="search_book(event)">Search</button>
         </form>
 
@@ -92,8 +96,8 @@
             $(".modalContainer").removeClass("d-none");
         }
 
-        function get_avail(issued, total) {
-            if(total > issued) {
+        function get_avail(issued) {
+            if(issued == 'none') {
                 return '<span class="badge badge-pill bg-success">Available</span>';
             }
             else {
@@ -113,7 +117,7 @@
             bIsbn = data.isbn
             bShortDesc = data.shortDescription
             bLongDesc = data.longDescription
-            bAvail = get_avail(data.issued, data.total)
+            bAvail = get_avail(data.issued)
 
             ele = '<div class="row mt-3"><div class="col-12 col-md-auto px-5 px-md-0"><img src="' + bImg + '" style="min-height: 200px; min-width: 100px;" alt=""></div><div class="col"><h4 class="font-weight-bold text-dark text-left mt-3 mt-md-2 mb-1">' + bTitle + '</h4><div class="font-weight-light text-secondary d-flex text-left mb-0 small">' + bAuthor + '</div><div class="mt-0 small text-dark">Status: ' +  bAvail  + '</div><p class="mb-0 text-primary small">Rack No: <span>' + bRack + '</span></p><p class="mt-0 small text-warning mb-0">Category: ' + bCategory + '</p><p class="mt-0 small text-secondary mb-0">ISBN: ' + bIsbn + '</p></div></div><h5 class="font-weight-light mt-3 mb-1">Description</h5><p>'+ bShortDesc +'</p><p>' + bLongDesc +  '</p>';  
 

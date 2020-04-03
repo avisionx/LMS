@@ -1,0 +1,41 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <nav class="navbar navbar-light bg-white shadow fixed-top">
+        <div class="container-fluid px-2 px-lg-4">
+            {% if user %}
+            <a class="navbar-brand" href="/dashboard">
+            {% else %}
+            <a class="navbar-brand" href="/">
+            {% endif %}
+                <img src="/static/img/logo.svg" height="35" alt="LMS">
+            </a>
+            <div class="ml-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link v-center pr-0 pr-lg-3" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="https://api.adorable.io/avatars/20/{{ user }}.png" width="30px" class="rounded-circle" alt="{{user}}">
+                        <p class="mb-0 pl-2 small d-none d-lg-block pt-1">{{user}}</p>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right border-0 shadow rounded-0 mt-3 mr-2 mr-lg-0 small" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item small pl-3" href="/logout"><i class="fas fa-sign-out-alt pr-2"></i> Logout</a>
+                    </div>
+                </div>   
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid px-3 px-lg-5 mb-5 mt-5 pt-4">
+        <div class="text-center" id="modalSpinnerBook" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+            <p class="mb-0 text-primary h1 mb-1">{{message}}</p>
+            <a href="/dashboard" class="btn btn-success btn-lg">Go Back</a>
+        </div>
+    </div>
+
+    
+{% endblock %}
+
+{% block script %}
+
+
+    
+{% endblock %}
