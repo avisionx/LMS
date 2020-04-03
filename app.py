@@ -54,19 +54,15 @@ def index():
 
 @app.route('/book/<id>', methods=['GET'])
 def get_book(id):
-    if 'username' in session:
-        username = session['username']
-        con = create_connection(database)
-        obj = {}
-        with con:
-            cur = con.cursor()
-            cur.execute("SELECT * FROM BOOKS WHERE _id=?", (id,))
-            row = cur.fetchone()
-            obj = get_book_obj(row)
-        return jsonify({"data": obj})
-    else:
-        abort(404)
-
+    con = create_connection(database)
+    obj = {}
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM BOOKS WHERE _id=?", (id,))
+        row = cur.fetchone()
+        obj = get_book_obj(row)
+    return jsonify({"data": obj})
+    
 @app.route('/book/remove/<id>', methods=['GET'])
 def book_remove(id):
     if 'username' in session:
