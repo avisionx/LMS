@@ -68,6 +68,7 @@
                 </div>
             </div>
             <div class="tab-pane fade show" id="customers" role="tabpanel" aria-labelledby="customers-tab">
+                
                 <div class="h1" id="modalSpinnerCustomer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)"><i class="fas fa-circle-notch fa-spin"></i></div>
                 <div class="hide" id="custContainer">
                     <form class="d-flex mt-4 mb-0">
@@ -91,10 +92,34 @@
                         
                     </div>
                 </div>
+
             </div>
             {% if is_admin %}
             <div class="tab-pane fade show" id="staff" role="tabpanel" aria-labelledby="staff-tab">
-                <div class="h1" id="modalSpinner4" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)"><i class="fas fa-circle-notch fa-spin"></i></div>
+                
+                <div class="h1" id="modalSpinnerStaff" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)"><i class="fas fa-circle-notch fa-spin"></i></div>
+                <div class="hide" id="staContainer">
+                    <form class="d-flex mt-4 mb-0">
+                        <input class="form-control mr-sm-2" type="text" placeholder="Search Staff" id="searchStaff">
+                        <a class="btn btn-success text-white btn-sm small v-center px-3 ml-2" style="white-space: nowrap" href="/staff/add">+ Add Staff</a>
+                    </form>
+                    <div class="row mb-2">
+                        <div class="col-12 mt-4">
+                            <div class="shadow p-3 w-100 text-left rounded border-0">
+                                <div class="row">
+                                    <div class="col-8"><p class="mb-0 font-weight-bold">Email Id</p></div>
+                                    <div class="col-2"><p class="mb-0 font-weight-bold">Admin Rights</p></div>
+                                    <div class="col-2"><p class="mb-0 font-weight-bold">Delete</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="staffContainer">
+                        
+                        
+                    </div>
+                </div>
+                
             </div>
             {% endif %}
         </div>
@@ -152,12 +177,41 @@
 
         var bookData = null;
         var custData = null;
+        var staffData = null;
 
         $("#customers-tab").on('click', () => {
             if(!custData) {
                 fetchData("/customers", populateCustomer);
             }
         });
+
+        $("#staff-tab").on('click', () => {
+            if(!staffData) {
+                fetchData("/staff", populateStaff);
+            }
+        });
+
+        function populateStaff(response) {
+            staffData = response;
+            var data = staffData.data;
+            for(var i = 0; i < data.length; i++) {
+                username = data[i].username
+                is_admin = data[i].is_admin
+                colorFac = is_admin == 0 ? 'text-danger' : 'text-success'
+                icoFac = is_admin == 0 ? 'fa-times-circle' : 'fa-check-circle'
+                ebtn = is_admin == 1 ? "disabled" : "";
+                slugUser = username.split("@")[0]
+                admin = '<span class="mb-0 font-weight-light ' + colorFac + '"><i class="far ' + icoFac + '"></i></span>'
+                ele = '<div class="col-12 mt-3"><div class="shadow p-2 px-3 font-weight-light w-100 text-left rounded border-0"><div class="row">'
+                ele += '<div class="col-8"><p class="mb-0">' + username + '</p></div>'
+                ele += '<div class="col-2"><p class="mb-0">' + admin + '</p></div>'
+                ele += '<div class="col-2"><a href="/staff/remove/' + slugUser + '" class="mb-0 btn btn-sm btn-danger rounded-pill ' + ebtn + ' ">Delete</a></div></div></div></div>'
+
+                $("#staffContainer").append(ele);
+            }
+            $("#staContainer").fadeIn();
+            $("#modalSpinnerStaff").fadeOut();
+        }
 
         function populateCustomer(response) {
             custData = response;

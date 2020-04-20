@@ -103,6 +103,26 @@ def user_remove(id):
     else:
         abort(404)
 
+
+@app.route('/staff/remove/<id>/', methods=['GET'])
+def staff_remove(id):
+    if 'username' in session:
+        username = session['username']
+        con = create_connection(database)
+        id = id + "@fiveteen.com"
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM STAFF WHERE username=?", (id,))
+            row = cur.fetchone()
+            if(row):
+                cur.execute("DELETE FROM STAFF WHERE username=?", (id,))
+                message = "Staff deleted successfully!"
+            else:
+                message = "No such staff found!"
+        return render_template('book_message.html', message=message, user=username)
+    else:
+        abort(404)
+
 @app.route('/book/add/', methods=['GET', 'POST'])
 def book_add():
     if 'username' in session:
@@ -130,6 +150,55 @@ def book_add():
     else:
         abort(404)
 
+@app.route('/user/add/', methods=['GET', 'POST'])
+def user_add():
+    if 'username' in session:
+        username = session['username']
+        message = None
+        try:
+            if request.method == 'POST':
+
+                roll_no = request.form.get('roll_no')
+                contact = request.form.get('contact')
+                name = request.form.get('name')
+                is_fac = request.form.get('is_fac')
+                if(not is_fac):
+                    is_fac = 0
+                con = create_connection(database)
+                with con:
+                    cur = con.cursor()
+                    cur.execute("INSERT INTO CUSTOMERS(roll_no, name, contact, is_fac) VALUES(?,?,?,?)", (roll_no, name, contact, is_fac))
+                message = "User added successfully!"
+        except:
+            message = "Error adding new User!"
+        return render_template('user_add.html', user=username, message=message)
+    else:
+        abort(404)
+
+
+@app.route('/staff/add/', methods=['GET', 'POST'])
+def staff_add():
+    if 'username' in session:
+        username = session['username']
+        message = None
+        try:
+            if request.method == 'POST':
+
+                usernameN = request.form.get('username')
+                password = request.form.get('password')
+                is_admin = request.form.get('is_admin')
+                if(not is_admin):
+                    is_admin = 0
+                con = create_connection(database)
+                with con:
+                    cur = con.cursor()
+                    cur.execute("INSERT INTO STAFF(username, password, is_admin) VALUES(?,?,?)", (usernameN, password, is_admin))
+                message = "Staff added successfully!"
+        except:
+            message = "Error adding new Staff!"
+        return render_template('staff_add.html', user=username, message=message)
+    else:
+        abort(404)
 
 @app.route('/book/issue/<bid>/<uid>', methods=['GET'])
 def book_issue(bid, uid):
@@ -248,6 +317,13 @@ def get_student_obj(row):
     obj['is_fac'] = row[3]
     return obj
 
+
+def get_staff_obj(row):
+    obj = {}
+    obj['username'] = row[0]
+    obj['is_admin'] = row[2]
+    return obj
+
 @app.route('/customers', methods=['GET'])
 def all_customers():
     if 'username' in session:
@@ -257,10 +333,29 @@ def all_customers():
         data = []
         with con:
             cur = con.cursor()
-            cur.execute("SELECT * FROM CUSTOMERS")
+            cur.execute("SELECT * FROM CUSTOMERS ORDER BY is_fac")
             rows = cur.fetchall()
             for row in rows:
                 obj = get_student_obj(row)
+                data.append(obj)
+        return jsonify({"data": data})
+    else:
+        abort(404)
+
+
+@app.route('/staff', methods=['GET'])
+def all_staff():
+    if 'username' in session:
+        username = session['username']
+        con = create_connection(database)
+        obj = {}
+        data = []
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM STAFF ORDER BY is_admin desc")
+            rows = cur.fetchall()
+            for row in rows:
+                obj = get_staff_obj(row)
                 data.append(obj)
         return jsonify({"data": data})
     else:
