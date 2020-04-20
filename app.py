@@ -82,6 +82,26 @@ def book_remove(id):
         return render_template('book_message.html', message=message, user=username)
     else:
         abort(404)
+    
+@app.route('/user/remove/<id>', methods=['GET'])
+def user_remove(id):
+    if 'username' in session:
+        username = session['username']
+        con = create_connection(database)
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM CUSTOMERS WHERE roll_no=?", (id,))
+            row = cur.fetchone()
+            if(row):
+                cur.execute("DELETE FROM CUSTOMERS WHERE roll_no=?", (id,))
+                cur.execute("DELETE FROM ISS_STU WHERE roll_no=?", (id,))
+                cur.execute("UPDATE BOOKS SET issued=? WHERE issued=?", ('none', id,))
+                message = "User deleted successfully!"
+            else:
+                message = "No such user found!"
+        return render_template('book_message.html', message=message, user=username)
+    else:
+        abort(404)
 
 @app.route('/book/add/', methods=['GET', 'POST'])
 def book_add():
@@ -137,6 +157,51 @@ def book_issue(bid, uid):
     else:
         abort(404)
 
+@app.route('/<fine>/<uid>/<bid>/', methods=['GET'])
+def book_fine(fine, uid, bid):
+    if 'username' in session:
+        username = session['username']
+        message = ""
+        con = create_connection(database)
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM CUSTOMERS WHERE roll_no=?", (uid,))
+            row = cur.fetchone()
+            if(row):
+                cur.execute("UPDATE ISS_STU SET fine=? WHERE _id=? and roll_no=?", (fine, bid, uid))
+                message = "Fine updated successfully!"
+            else:
+                message = "No such user exists!"
+        return render_template('book_message.html', message=message, user=username)
+    else:
+        abort(404)
+
+@app.route('/book/return/<bid>/<uid>', methods=['GET'])
+def book_return(bid, uid):
+    if 'username' in session:
+        username = session['username']
+        message = ""
+        con = create_connection(database)
+        with con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM CUSTOMERS WHERE roll_no=?", (uid,))
+            row = cur.fetchone()
+            if(row):
+                today = date.today()
+                cur.execute("SELECT issued from BOOKS WHERE _id=?", (bid, ))
+                row = cur.fetchone()
+                if(row[0] == uid):
+                    cur.execute("UPDATE BOOKS SET issued=? WHERE _id=?", ('none', bid))
+                    cur.execute("UPDATE ISS_STU SET return_date=? WHERE _id=? and roll_no=?", (str(today), bid, uid))
+                    message = "Book returned successfully!"
+                else:
+                    message = "Book not returned!"
+            else:
+                message = "No such user exists!"
+        return render_template('book_message.html', message=message, user=username)
+    else:
+        abort(404)
+
 @app.route('/custdata/<id>', methods=['GET'])
 def get_cust(id):
     if 'username' in session:
@@ -152,7 +217,7 @@ def get_cust(id):
         con = create_connection(database)
         with con:
             cur = con.cursor()
-            cur.execute("SELECT * FROM ISS_STU WHERE roll_no=?", (id,))
+            cur.execute("SELECT * FROM ISS_STU WHERE roll_no=? ORDER BY return_date", (id,))
             rows = cur.fetchall()
             for row in rows:
                 obj = get_issue_obj(row)
@@ -161,8 +226,19 @@ def get_cust(id):
     else:
         abort(404)
 
-def get_issue_obj(row):
-    print(row)
+def get_issue_obj(book_det):
+    con = create_connection(database)
+    book = None
+    with con:
+        cur = con.cursor()
+        id = book_det[0]
+        cur.execute("SELECT * FROM BOOKS WHERE _id=?", (id,))
+        row = cur.fetchone()
+        book = get_book_obj(row, desc=False)
+    book['issue_date'] = book_det[2]
+    book['return_date'] = book_det[3]
+    book['fine_due'] = book_det[4]
+    return book
 
 def get_student_obj(row):
     obj = {}

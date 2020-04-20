@@ -100,19 +100,43 @@
         </div>
     </div>
 
-    <div class="modalContainer bg-translucent d-none mt-5 pt-3">
-            <div class="h-100 w-100 v-center h-center p-3 p-lg-5">
-                <div class="bg-white h-100 w-100 rounded shadow px-3 py-3" style="position: relative">
-                    <div class="btn text-danger bg-white rounded-circle" onclick="hideModal()" style="position: absolute; right: -0.65rem; font-size: 1.5rem; top: -0.6rem;"><i class="far fa-times-circle"></i></div>
-                    <div style="overflow-y: scroll; height: 100%;" class="customScroll">
-                        <div class="h1" id="modalSpinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)"><i class="fas fa-circle-notch fa-spin"></i></div>
-                        <div id="modalContent" class="p-3 d-none">
-                              
-                        </div>
+    <div class="modalContainer d-none bg-translucent mt-5 pt-3">
+        <div class="h-100 w-100 v-center h-center p-3 p-lg-5">
+            <div class="bg-white h-100 w-100 rounded shadow px-3 py-3" style="position: relative">
+                <div class="btn text-danger bg-white rounded-circle" onclick="hideModal()" style="position: absolute; right: -0.65rem; font-size: 1.5rem; top: -0.6rem;"><i class="far fa-times-circle"></i></div>
+                <div style="overflow-y: scroll; height: 100%;" class="customScroll">
+                    <div class="h1" id="modalSpinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)"><i class="fas fa-circle-notch fa-spin"></i></div>
+                    <div id="modalContent" class="p-3 d-none">
+                                
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="modal fade" id="fineModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Set Fine</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Fine Value</label>
+                <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" id="fineValue" aria-describedby="emailHelp" placeholder="Fine">
+                <small id="emailHelp" class="form-text text-muted">Please enter new fine value.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="saveFine()">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
     
 {% endblock %}
 
@@ -164,10 +188,51 @@
         }
 
         function populateCustomerModal(response) {
-            console.log(response)
-            $("#modalContent").html(data);
+            userName = response.user.name
+            userContact = response.user.contact
+            userId = response.user.roll_no
+            colorFac = response.user.is_fac == 0 ? 'text-danger' : 'text-success'
+            icoFac = response.user.is_fac == 0 ? 'fa-times-circle' : 'fa-check-circle'
+            isFAC = '<span class="mb-0 ml-1 font-weight-light ' + colorFac + '"><i class="far ' + icoFac + '"></i></span>';
+            ele = '<h4 class="mb-1 text-info font-weight-bold">' + userName + '</h5>';
+            ele += '<p class="mb-1">Faculty: ' + isFAC + '</p>';
+            ele += '<p class="mb-1">Contact: ' + userContact + '</p>';
+            ele += '<p class="mb-1">' + userId + '</p>';
+            ele += '<a class="btn btn-danger text-white btn-sm small" href="/user/remove/' + userId + '">Remove User</a>';
+            ele += '<h5 class="mt-3 font-weight-light mb-0">Books Issued</h5>';
+            ele += '<div class="row"><div class="col-12 mt-1"><div class="p-3 w-100 text-left rounded border-0"><div class="row"><div class="col-1"><p class="mb-0 font-weight-bold">Id</p></div><div class="col-4"><p class="mb-0 font-weight-bold">Name</p></div><div class="col-2"><p class="mb-0 font-weight-bold">Issue Date</p></div><div class="col-2"><p class="mb-0 font-weight-bold">Return Date</p></div><div class="col-1"><p class="mb-0 font-weight-bold">Fine</p></div><div class="col-1"><p class="mb-0 font-weight-bold">Add Fine</p></div><div class="col-1"><p class="mb-0 font-weight-bold">Return</p></div> </div></div></div></div>';
+            response.books.forEach(book => {
+                bookReturn = book.return_date == "" ? false : true;
+                retu = bookReturn ? book.return_date : "Not Returned"
+                bEnable = bookReturn ? "disabled" : ""
+                ele += '<div class="row py-1"><div class="col-12 mt-1"><div class="px-3 w-100 text-left rounded border-0 font-weight-light"><div class="row">';
+                ele += '<div class="col-1"><p class="mb-0">' + book._id + '</p></div>'
+                ele += '<div class="col-4"><p class="mb-0">' + book.title + '</p></div>'
+                ele += '<div class="col-2"><p class="mb-0">' + book.issue_date + '</p></div>';
+                ele += '<div class="col-2"><p class="mb-0">' + retu + '</p></div>';
+                ele += '<div class="col-1"><p class="mb-0">' + book.fine_due + '</p></div>';
+                ele += '<div class="col-1 small"><a class="btn btn-sm rounded-pill btn-outline-danger" href="#" data-toggle="modal" data-target="#fineModal" onclick="setFineObj(\'' + userId + '\',\'' + book._id + '\')">Edit Fine</a></div>'
+                ele += '<div class="col-1 small"><a class="btn btn-sm rounded-pill btn-outline-success ' + bEnable + '" href="/book/return/' + book._id + '/' + userId + '">Return</a></div>'
+                ele += '</div></div></div></div>';
+                
+            }); 
+            
+            $("#modalContent").html(ele);
             $("#modalContent").removeClass("d-none");
             $("#modalSpinner").addClass("d-none");
+        }
+
+        var uidFINE = null;
+        var bidFINE = null;
+
+        function setFineObj(uid, bid) {
+            uidFINE = uid;
+            bidFINE = bid;
+        }
+
+        function saveFine() {
+            fineamonut = $("#fineValue").val();
+            window.location.replace("/" + fineamonut + "/" + uidFINE + "/" + bidFINE);
         }
         
         $("#searchBook").keyup( (event)=> {
