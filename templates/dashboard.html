@@ -32,6 +32,9 @@
             <li class="nav-item mr-2 mr-md-4 mt-3">
                 <a class="nav-link rounded btn btn-sm" id="customers-tab" data-toggle="tab" href="#customers" role="tab" aria-controls="customers" aria-selected="false">STUDENTS/FACULTY</a>
             </li>
+            <li class="nav-item mr-2 mr-md-4 mt-3">
+                <a class="nav-link rounded btn btn-sm" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">STATISTICS</a>
+            </li>
             {% if is_admin %}
             <li class="nav-item mr-2 mr-md-4 mt-3">
                 <a class="nav-link rounded btn btn-sm" id="staff-tab" data-toggle="tab" href="#staff" role="tab" aria-controls="staff" aria-selected="false">STAFF</a>
@@ -93,6 +96,27 @@
                     </div>
                 </div>
 
+            </div>
+            <div class="tab-pane fade show" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                
+                <div class="row">
+                    <div class="col">
+                        <h3 class="text-info font-weight-light mt-3 text-uppercase">Important Statistics</h3>
+                    </div>
+                    <div class="col-auto v-center">
+                        <a class="btn btn-success text-white v-center px-3" style="white-space: nowrap" href="/makecharts">Reload</a>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    {% for img in statImg %}
+                    <div class="col-12 col-md-4">
+                        <img src="/static/img/stats/{{img}}" class="h-100 w-100">
+                    </div>
+                    {% endfor %}
+                </div>
+                
             </div>
             {% if is_admin %}
             <div class="tab-pane fade show" id="staff" role="tabpanel" aria-labelledby="staff-tab">

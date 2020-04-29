@@ -1,12 +1,22 @@
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import os
+import shutil 
 from flask import Flask, render_template, redirect, url_for, request, jsonify, session, abort
 import sqlite3 
 import json
-from datetime import date
+from datetime import date, datetime
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'mz*.5"tjXQ97x{h'
 
 database = 'lmsdatabase.db'
+
+statImg = [
+    
+]
 
 def create_connection(db_file):
     conn = None
@@ -198,6 +208,86 @@ def staff_add():
     else:
         abort(404)
 
+@app.route('/makecharts', methods=['GET'])
+def make_charts():
+    
+    global statImg
+
+    shutil.rmtree("./static/img/stats/")
+    os.mkdir("./static/img/stats/")
+    
+    statImg = []
+    imgName = ""
+    if 'username' in session:
+        username = session['username']
+        con = create_connection(database)
+        message = "Charts have been reloaded!"
+        with con:
+            cur = con.cursor()
+            
+            cur.execute("select count(*), issue_date from ISS_STU group by issue_date")
+            rows = cur.fetchall()
+            X = []
+            Y = []
+            now = datetime.now().time()
+            timestamp = str(now).replace(":", "-").replace(".", "-")
+            imgName = timestamp + 'issue.png'
+            if(len(rows) > 0):
+                statImg.append(imgName)
+                for row in rows:
+                    Y.append(row[0])
+                    X.append(row[1])
+                plt.bar(X, Y, color="orange")
+                plt.yticks(np.arange(min(Y) - 1, max(Y) + 1, step=1))
+                plt.xlabel("Dates")
+                plt.ylabel("No of Book")
+                plt.title("Books issued per day")
+                plt.savefig('./static/img/stats/' + imgName) 
+                plt.close()
+        with con:
+            cur = con.cursor()
+            cur.execute("select count(*), return_date from ISS_STU where return_date != '' group by return_date")
+            rows = cur.fetchall()
+            X = []
+            Y = []
+            now = datetime.now().time()
+            timestamp = str(now).replace(":", "-").replace(".", "-")
+            imgName = timestamp + 'return.png'
+            if(len(rows) > 0):
+                statImg.append(imgName)
+                for row in rows:
+                    Y.append(row[0])
+                    X.append(row[1])
+                plt.bar(X, Y, color="green")
+                plt.yticks(np.arange(min(Y) - 1, max(Y) + 1, step=1))
+                plt.xlabel("Dates")
+                plt.ylabel("No of Book")
+                plt.title("Books returned per day")
+                plt.savefig('./static/img/stats/' + imgName) 
+                plt.close() 
+        with con:
+            cur = con.cursor()
+            cur.execute("select avg(fine), max(fine), sum(fine) from ISS_STU")
+            rows = cur.fetchone()
+            try:
+                f = rows[0] > 0
+                Y = rows
+                X = ['Average', 'Max', 'Total']
+                now = datetime.now().time()
+                timestamp = str(now).replace(":", "-").replace(".", "-")
+                imgName = timestamp + 'fine.png'
+                statImg.append(imgName)
+                plt.bar(X, Y, color="green")
+                plt.ylabel("Fine in Rs.")
+                plt.title("Fine statistics")
+                plt.savefig('./static/img/stats/' + imgName) 
+                plt.close()
+            except:
+                pass
+        return render_template('book_message.html', user=username, message=message)
+    else:
+        abort(404)
+
 @app.route('/book/issue/<bid>/<uid>', methods=['GET'])
 def book_issue(bid, uid):
     if 'username' in session:
@@ -223,6 +313,7 @@ def book_issue(bid, uid):
         return render_template('book_message.html', message=message, user=username)
     else:
         abort(404)
+
 
 @app.route('/<fine>/<uid>/<bid>/', methods=['GET'])
 def book_fine(fine, uid, bid):
@@ -412,7 +503,6 @@ def validate(username, password):
 def check_password(hashed_password, user_password):
     return hashed_password == user_password
 
-
 @app.route('/dashboard')
 def dashboard():
     if 'username' in session:
@@ -437,7 +527,7 @@ def dashboard():
             for row in rows:
                 obj = get_book_obj(row, desc=False)
                 data.append(obj)
-        return render_template('dashboard.html', user=username, is_admin=is_admin, books=data)
+        return render_template('dashboard.html', user=username, is_admin=is_admin, books=data, statImg=statImg)
     else:
         return redirect(url_for('login'))
 
