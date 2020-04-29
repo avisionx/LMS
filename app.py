@@ -16,7 +16,6 @@ def create_connection(db_file):
         print(e)
     return conn
 
-
 def get_book_obj(row, desc=True):
     obj = {}
     obj['_id'] = row[0]
@@ -34,7 +33,6 @@ def get_book_obj(row, desc=True):
         obj['rack'] = row[8]
         obj['issued'] = row[9]
     return obj
-
 
 @app.route('/', methods=['GET'])
 def index():
@@ -317,6 +315,12 @@ def get_student_obj(row):
     obj['is_fac'] = row[3]
     return obj
 
+def run_query(arg):
+    con = create_connection(database)
+    with con:
+        return arg
+        cur = con.cursor()
+        cur.execute(arg)
 
 def get_staff_obj(row):
     obj = {}
@@ -364,6 +368,11 @@ def all_staff():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html')
+
+def initialize_db():
+    run_query("CREATE INDEX IF NOT EXISTS idx_book ON BOOK (_id);")
+    run_query("CREATE INDEX IF NOT EXISTS idx_roll_no ON CUSTOMERS (roll_no);")
+    run_query("CREATE INDEX IF NOT EXISTS idx_username ON STADD (username);")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -433,4 +442,5 @@ def dashboard():
         return redirect(url_for('login'))
 
 if __name__== "__main__":
+    initialize_db()
     app.run(debug=True)
